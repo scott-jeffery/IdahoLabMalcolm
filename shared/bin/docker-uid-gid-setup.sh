@@ -30,7 +30,6 @@ groupmod --non-unique --gid ${PGID:-${DEFAULT_GID}} ${PGROUP}
 #   inside of other CONFIG_MAP_DIR directories. More than one CONFIG_MAP_DIR can be specified
 #   in this variable, separated by ';' (for example, "CONFIG_MAP_DIR=configmap;secretmap").
 #
-# TODO: else with cpio, tar, cp?
 
 CONFIG_MAP_FIND_PRUNE_ARGS=()
 if [[ -n ${CONFIG_MAP_DIR} ]] && command -v rsync >/dev/null 2>&1; then
@@ -60,7 +59,7 @@ if [[ -n ${CONFIG_MAP_DIR} ]] && command -v rsync >/dev/null 2>&1; then
           true
       done # loop over flattened filenames
 
-        # TODO - regarding ownership and permissions:
+        # regarding ownership and permissions:
         #
         # I *think* what we want to do here is change the ownership of
         #   these configmap-copied files to be owned by the user specified by PUID
@@ -116,9 +115,9 @@ if [[ -n ${PUSER_MKDIR} ]]; then
     if [[ -n ${REQ_DIR} ]] && [[ -d "${REQ_DIR}" ]]; then
       IFS=',' read -ra MKDIR_DIRS <<< "$(echo "${ENTITY}" | cut -d: -f2-)"
       for NEW_DIR in "${MKDIR_DIRS[@]}"; do
-        [[ ! -d "${REQ_DIR}"/"${NEW_DIR}" ]] && \
-          mkdir -p "${REQ_DIR}"/"${NEW_DIR}" 2>/dev/null && \
-          ( ( [[ -n ${PUID} ]] && chown -R -f ${PUID} "${REQ_DIR}$(echo /"${NEW_DIR}" | awk -F/ '{print FS $2}')" 2>/dev/null ) ; ( [[ -n ${PGID} ]] && chown -R -f :${PGID} "${REQ_DIR}$(echo /"${NEW_DIR}" | awk -F/ '{print FS $2}')" 2>/dev/null ) )
+        mkdir -p "${REQ_DIR}"/"${NEW_DIR}" 2>/dev/null
+        [[ -n ${PUID} ]] && chown -R -f ${PUID} "${REQ_DIR}$(echo /"${NEW_DIR}" | awk -F/ '{print FS $2}')" 2>/dev/null
+        [[ -n ${PGID} ]] && chown -R -f :${PGID} "${REQ_DIR}$(echo /"${NEW_DIR}" | awk -F/ '{print FS $2}')" 2>/dev/null
       done
     fi
   done
